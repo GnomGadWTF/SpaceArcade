@@ -5,54 +5,42 @@ using UnityEngine;
 
 namespace SpaceArcade
 {
+    /// <summary>
+    /// Скрипт пули
+    /// Пуля должна иметь скорость полета
+    /// Она должна лететь в направлении мыши
+    /// </summary>
     public class Bullet : MonoBehaviour
     {
         [Header("Снаряд")]
-        [Tooltip("Скорость полета снаряда")]
-        public float moveSpeed = 1;
+        [Tooltip("Скорость полета снаряда м/c\nЗначение можно поменять в пушке")]
+        public float flightSpeed = 1;
 
+        [Tooltip("Если пуля стреляная, то true")]
+        public bool isActive = false;
 
-
-        internal Transform thisTransform;
         static GameController gameController;
 
+        internal Transform thisTransform;
+        internal Rigidbody2D rb;
+
+        
 
         void Awake()
         {
             thisTransform = this.transform;
             if (gameController == null) gameController = GameObject.FindObjectOfType<GameController>();
+            rb = gameObject.GetComponent<Rigidbody2D>();
         }
 
 
-        public Vector3 targetPosition;
-
-        float moveTimeSpeed = 1;
-
-        private Vector2 startPos;
-
-        float t = 0;
-
-        bool onTarget;
-
-        void Start()
+        void FixedUpdate()
         {
-            startPos = transform.position;
-            onTarget = false;
-        }
-
-
-        void Update()
-        {
-            if (!onTarget)
+            if (isActive)
             {
-                t += Time.deltaTime;
-                transform.position = Vector2.Lerp(startPos, targetPosition, t / moveTimeSpeed);
-                if (t >= 1)
-                {
-                    transform.position = targetPosition;
-                    onTarget = true;
-                    t = 0;
-                }
+                Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                direction = (direction - new Vector2(thisTransform.position.x, thisTransform.position.y));
+                rb.AddForce(direction.normalized * flightSpeed, ForceMode2D.Impulse);
             }
         }
     }

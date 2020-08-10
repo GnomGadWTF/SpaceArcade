@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace SpaceArcade
 {
+    /// <summary>
+    /// Класс корабля
+    /// </summary>
     public class SpaceShip : MonoBehaviour
     {   
         internal Transform thisTransform;

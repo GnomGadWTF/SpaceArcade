@@ -10,7 +10,8 @@ namespace SpaceArcade
         [Header("Граунд")]
         [Tooltip("объект пола")]
         public Ground groundObject;
-        float positionX = 0.0f; //положение в координатах
+        //Стартовое положение в координатах
+        float positionX = 0.0f; 
 
         [Header("Игрок")]
         [Tooltip("Объект корабля игрока")]

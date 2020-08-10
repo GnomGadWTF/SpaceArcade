@@ -6,10 +6,23 @@ namespace SpaceArcade
 {
     public class TowerGun : MonoBehaviour
     {
-        //[Header("Пушка")]
+        [Header("Характеристики пушки")]
+        [Tooltip("Время между выстрелами")]
+        public float shootDelay = 0.1f;
 
-        private Vector3 mousePosition;
+        [Header("Характеристики снаряда")]
+        [Tooltip("Снаряд для пушки")]
+        public GameObject currentProjectille;
+        [Tooltip("Скорость пули")]
+        public float speedProject = 5;
+        [Tooltip("Время жизни снаряда")]
+        public float timeLiveProhect = 0.5f;
+
+
+        protected float shootDelayCounter;
+
         internal Transform thisTransform;
+
         static GameController gameController;
 
         void Awake()
@@ -18,16 +31,12 @@ namespace SpaceArcade
             if (gameController == null) gameController = GameObject.FindObjectOfType<GameController>();
         }
 
-        void Start()
-        {
-        }
-
         void FixedUpdate()
         {
-            Shoot();
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+
+            if (currentProjectille && Input.GetMouseButton(0))
             {
-                
+                Shoot();
             }
             LockAtMouse();
         }
@@ -37,65 +46,29 @@ namespace SpaceArcade
         /// </summary>
         public void LockAtMouse()
         {
-            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 difference = (mousePosition - thisTransform.position).normalized;
             float rotation_z = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
             thisTransform.rotation = Quaternion.Euler(0f, 0f, rotation_z);
         }
-        public GameObject currentProjectille;
-
-        public float shootDelay;
-
-        public Transform shootPostion; // пустой объект на дуле пушки
-
-        protected float shootDelayCounter;
-
-        private Rigidbody2D myRigidbody;
-      
+        
+        /// <summary>
+        /// Выстрел
+        /// </summary>
         private void Shoot()
         {
             shootDelayCounter += Time.deltaTime;
-
-            if (Input.GetMouseButton(0))
+            if (shootDelayCounter >= shootDelay)
             {
-                RotateToClick();
-
-                if (shootDelayCounter >= shootDelay)
-                {
-                    var bullet = Instantiate(currentProjectille, shootPostion.position, shootPostion.rotation);
-                    bullet.GetComponent<Bullet>().targetPosition = mousePosition1*10;
-                    Destroy(bullet, 0.5f);
-                    shootDelayCounter = 0;
-                }
+                var bullet = Instantiate(currentProjectille, thisTransform.position, thisTransform.rotation);
+                var b = bullet.GetComponent<Bullet>();
+                b.flightSpeed = speedProject;
+                b.thisTransform = thisTransform;
+                b.isActive = true;
+                
+                Destroy(bullet, timeLiveProhect);
+                shootDelayCounter = 0;
             }
         }
-
-        private Vector3 mousePosition1;
-
-        private float angle;
-
-        void RotateToClick()
-        {
-            //позиция мыши в мировых координатах
-            mousePosition1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            // Угол между объектами
-            angle = Vector2.Angle(Vector2.right, mousePosition1 - transform.position); //угол между вектором от объекта к мыше и осью х
-
-            // Мгновенное вращение
-            transform.eulerAngles = new Vector3(0f, 0f, transform.position.y < mousePosition1.y ? angle : -angle);
-
-            // Вращение с задержкой (не успеет повернуться, если в направлении клика стрелять)
-            // transform.rotation = Quaternion.RotateTowards (transform.rotation, Quaternion.Euler (0, 0, transform.position.y < mousePosition.y ? angle : -angle), RotateSpeed * Time.deltaTime);
-        }
-
-
-
-
-
-
-
-
-
     }
 }

@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Скрипт заднего фона
+/// Скрипт вешается на граунд
+/// </summary>
 public class Ground : MonoBehaviour
 {
     [Header("Класс пола")]
